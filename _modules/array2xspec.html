@@ -1,0 +1,463 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>array2xspec &mdash; pyxspec_utils 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="pyxspec_utils 0.0.1 documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pyxspec_utils
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">Modules and functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dependencies.html">Dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../morehelp.html">Finding help without this documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyxspec_utils</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>array2xspec</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for array2xspec</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding: utf-8</span>
+<span class="sd">&quot;&quot;&quot; Manipulate python data to produce Xspec readable files&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="k">import</span> <span class="n">fits</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+<div class="viewcode-block" id="read_from_txt"><a class="viewcode-back" href="../source/array2xspec.html#array2xspec.read_from_txt">[docs]</a><span class="k">def</span> <span class="nf">read_from_txt</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reads a text file to create xspec readable fits file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename: str</span>
+<span class="sd">        A text files with 2 or 3 columns to read.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    energies, values(, erros): ndarrays</span>
+<span class="sd">        The columns present in the file text</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    IOError</span>
+<span class="sd">        If the files has less than 2 or more than 3 columns or is read as such</span>
+<span class="sd">        due to formatting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">table</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="k">if</span> <span class="n">table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">energies</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">yvalues</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">energies</span><span class="p">,</span> <span class="n">yvalues</span>
+    <span class="k">elif</span> <span class="n">table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">energies</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">yvalues</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">yerrors</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">energies</span><span class="p">,</span> <span class="n">yvalues</span><span class="p">,</span> <span class="n">yerrors</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;File has </span><span class="si">{}</span><span class="s2"> columns&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="fake_pha"><a class="viewcode-back" href="../source/array2xspec.html#array2xspec.fake_pha">[docs]</a><span class="k">def</span> <span class="nf">fake_pha</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">energies</span><span class="p">,</span>
+             <span class="n">errors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;fake&quot;</span><span class="p">,</span>
+             <span class="n">respfile</span><span class="o">=</span><span class="s2">&quot;NONE&quot;</span><span class="p">,</span>
+             <span class="n">telescope</span><span class="o">=</span><span class="s2">&quot;FAKE&quot;</span><span class="p">,</span> <span class="n">instrument</span><span class="o">=</span><span class="s2">&quot;FAKE&quot;</span><span class="p">,</span>
+             <span class="n">afilter</span><span class="o">=</span><span class="s2">&quot;NONE&quot;</span><span class="p">,</span> <span class="n">backfile</span><span class="o">=</span><span class="s2">&quot;NONE&quot;</span><span class="p">,</span>
+             <span class="n">corrfile</span><span class="o">=</span><span class="s2">&quot;NONE&quot;</span><span class="p">,</span> <span class="n">ancrfile</span><span class="o">=</span><span class="s2">&quot;NONE&quot;</span><span class="p">,</span>
+             <span class="n">syserr</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="s2">&quot;2001-01-01&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Creates a fake pha file to be read fitted with xspec</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        values: ndarray</span>
+<span class="sd">            Values of the fake data</span>
+<span class="sd">        energies: ndarray</span>
+<span class="sd">            Array of bin edges for the x-axis (lenght of values + 1)</span>
+<span class="sd">        errors: ndarray, optional</span>
+<span class="sd">            statistical error of the fake data. Default is zero</span>
+<span class="sd">        prefix: str, optional</span>
+<span class="sd">            A prefix to save file as &lt;prefix&gt;.pha. Defauls is &quot;fake&quot;</span>
+
+<span class="sd">        Other Parameters</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        date: str</span>
+<span class="sd">            File creation date. Default is &quot;2001-01-01&quot;</span>
+<span class="sd">        telescope: str</span>
+<span class="sd">            Name of the mission/telescope</span>
+<span class="sd">        instrument: str</span>
+<span class="sd">            Name of the instrument used</span>
+<span class="sd">        afilter: str</span>
+<span class="sd">            FILTER keyword</span>
+<span class="sd">        respfile: str</span>
+<span class="sd">            Response file.</span>
+<span class="sd">        backfile: str</span>
+<span class="sd">            Background file</span>
+<span class="sd">        corrfile: str</span>
+<span class="sd">            CORRFILE keyword</span>
+<span class="sd">        ancrfile: str</span>
+<span class="sd">            ANCRFILE keyword</span>
+<span class="sd">        syserr: float</span>
+<span class="sd">            systematic error on data</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Creates &lt;prefix&gt;.pha file in the current directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">hdu1</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">()</span>
+
+    <span class="n">hdu1</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;DATE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">date</span><span class="p">,</span> <span class="s2">&quot;Fake creation date&quot;</span>
+    <span class="n">hdu1</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;TELESCOP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">telescope</span><span class="p">,</span> <span class="s2">&quot;Fake mission name&quot;</span>
+    <span class="n">hdu1</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;INSTRUME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instrument</span><span class="p">,</span> <span class="s2">&quot;Fake instrument name&quot;</span>
+    <span class="n">hdu1</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;CONTENT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;SPECTRUM&quot;</span>
+    <span class="n">hdu1</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;PHAVERSN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1992a&quot;</span>
+
+    <span class="k">if</span> <span class="n">errors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">val</span><span class="o">*</span><span class="p">(</span><span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">values</span><span class="p">)])</span>
+    <span class="n">stat_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">err</span><span class="o">*</span><span class="p">(</span><span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">energies</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">err</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">errors</span><span class="p">)])</span>
+    <span class="n">channels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">energies</span><span class="p">))</span>
+
+    <span class="n">col_channel</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;CHANNEL&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;1I&quot;</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="n">channels</span><span class="p">)</span>
+    <span class="n">col_counts</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;COUNTS&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="n">counts</span><span class="p">)</span>
+    <span class="n">col_stat_err</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;STAT_ERR&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="n">stat_err</span><span class="p">)</span>
+    <span class="n">pha_cols</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">ColDefs</span><span class="p">([</span><span class="n">col_channel</span><span class="p">,</span> <span class="n">col_counts</span><span class="p">,</span> <span class="n">col_stat_err</span><span class="p">])</span>
+
+    <span class="n">pha_head</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="p">()</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;SPECTRUM&quot;</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;TELESCOP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">telescope</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;INSTRUME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instrument</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;FILTER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">afilter</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;EXPOSURE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;AREASCAL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;BACKSCAL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;CORRSCAL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;BACKFILE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">backfile</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;CORRFILE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">corrfile</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;RESPFILE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">respfile</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;ANCRFILE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ancrfile</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;POISSERR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;CHANTYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;PHA&quot;</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;DETCHANS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;SYS_ERR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syserr</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;QUALITY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;GROUPING&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;HDUCLASS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;OGIP&quot;</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;HDUCLAS1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;SPECTRUM&quot;</span>
+    <span class="n">pha_head</span><span class="p">[</span><span class="s2">&quot;HDUVERS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1.1.0&quot;</span>
+
+    <span class="n">spechdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">BinTableHDU</span><span class="o">.</span><span class="n">from_columns</span><span class="p">(</span><span class="n">pha_cols</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">pha_head</span><span class="p">)</span>
+    <span class="n">phafile</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">([</span><span class="n">hdu1</span><span class="p">,</span> <span class="n">spechdu</span><span class="p">])</span>
+    <span class="n">phafile</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.pha&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">),</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="fake_rmf"><a class="viewcode-back" href="../source/array2xspec.html#array2xspec.fake_rmf">[docs]</a><span class="k">def</span> <span class="nf">fake_rmf</span><span class="p">(</span><span class="n">energies</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;fake&quot;</span><span class="p">,</span>
+             <span class="n">telescope</span><span class="o">=</span><span class="s2">&quot;FAKE&quot;</span><span class="p">,</span> <span class="n">instrument</span><span class="o">=</span><span class="s2">&quot;FAKE&quot;</span><span class="p">,</span>
+             <span class="n">date</span><span class="o">=</span><span class="s2">&quot;2001-01-01&quot;</span><span class="p">,</span> <span class="n">afilter</span><span class="o">=</span><span class="s2">&quot;NONE&quot;</span><span class="p">,</span>
+             <span class="n">effarea</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Creates a dummy rmf file with a diagonal response</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        energies: ndarray</span>
+<span class="sd">            Array of bin edges for the x-axis (lenght of values + 1)</span>
+<span class="sd">        prefix: str, optional</span>
+<span class="sd">                A prefix to save file as &lt;prefix&gt;.pha. Defauls is &quot;fake&quot;</span>
+
+<span class="sd">        Other Parameters</span>
+<span class="sd">        ----------------</span>
+<span class="sd">        date: str</span>
+<span class="sd">            File creation date. Default is &quot;2001-01-01&quot;</span>
+<span class="sd">        telescope: str</span>
+<span class="sd">            Name of the mission/telescope</span>
+<span class="sd">        instrument: str</span>
+<span class="sd">            Name of the instrument used</span>
+<span class="sd">        afilter: str</span>
+<span class="sd">            FILTER keyword</span>
+<span class="sd">        effarea: float</span>
+<span class="sd">            EFFAREA keyword.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Creates &lt;prefix&gt;.rmf file in the current directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">prihdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">()</span>
+
+    <span class="n">prihdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;DATE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">date</span><span class="p">,</span> <span class="s2">&quot;Fake creation date&quot;</span>
+    <span class="n">prihdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;TELESCOP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">telescope</span><span class="p">,</span> <span class="s2">&quot;Fake mission name&quot;</span>
+    <span class="n">prihdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;INSTRUME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instrument</span><span class="p">,</span> <span class="s2">&quot;Fake instrument name&quot;</span>
+    <span class="n">prihdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;CONTENT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;SPECTRUM&quot;</span>
+
+    <span class="n">channels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">energies</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">energ_lo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">energies</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">energ_hi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">energies</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="n">n_grp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span>
+    <span class="n">f_chan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span>
+    <span class="n">n_chan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">))</span>
+
+    <span class="n">matrix</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">identi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">identi</span><span class="p">:</span>
+        <span class="n">matrix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">identi</span><span class="p">))</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+
+    <span class="n">col_energ_lo</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;ENERG_LO&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span>
+                               <span class="n">array</span><span class="o">=</span><span class="n">energ_lo</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;keV&quot;</span><span class="p">)</span>
+    <span class="n">col_energ_hi</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;ENERG_HI&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span>
+                               <span class="n">array</span><span class="o">=</span><span class="n">energ_hi</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;keV&quot;</span><span class="p">)</span>
+    <span class="n">col_n_grp</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;N_GRP&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;1I&quot;</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="n">n_grp</span><span class="p">)</span>
+    <span class="n">col_f_chan</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;F_CHAN&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;1I&quot;</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="n">f_chan</span><span class="p">)</span>
+    <span class="n">col_n_chan</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;N_CHAN&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;1I&quot;</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="n">n_chan</span><span class="p">)</span>
+    <span class="n">col_matrix</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;MATRIX&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">E&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">)),</span>
+                             <span class="n">array</span><span class="o">=</span><span class="n">identi</span><span class="p">)</span>
+
+    <span class="n">matrix_cols</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">ColDefs</span><span class="p">([</span><span class="n">col_energ_lo</span><span class="p">,</span>
+                                <span class="n">col_energ_hi</span><span class="p">,</span>
+                                <span class="n">col_n_grp</span><span class="p">,</span>
+                                <span class="n">col_f_chan</span><span class="p">,</span>
+                                <span class="n">col_n_chan</span><span class="p">,</span>
+                                <span class="n">col_matrix</span><span class="p">])</span>
+
+    <span class="n">m_head</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="p">()</span>
+    <span class="n">m_head</span><span class="p">[</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;MATRIX&quot;</span><span class="p">,</span> <span class="s2">&quot;name of this binary table extension&quot;</span>
+    <span class="n">m_head</span><span class="p">[</span><span class="s2">&quot;TELESCOP&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">telescope</span><span class="p">,</span> <span class="s2">&quot;Fake Mission name&quot;</span>
+    <span class="n">m_head</span><span class="p">[</span><span class="s2">&quot;INSTRUME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instrument</span><span class="p">,</span> <span class="s2">&quot;Fake instrument name&quot;</span>
+    <span class="n">m_head</span><span class="p">[</span><span class="s2">&quot;FILTER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">afilter</span>
+    <span class="n">m_head</span><span class="p">[</span><span class="s2">&quot;CHANTYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;PHA&quot;</span>
+    <span class="n">m_head</span><span class="p">[</span><span class="s2">&quot;DETCHANS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span>
+    <span class="n">m_head</span><span class="p">[</span><span class="s2">&quot;LO_THRES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">m_head</span><span class="p">[</span><span class="s2">&quot;EFFAREA&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">effarea</span>
+    <span class="n">m_head</span><span class="p">[</span><span class="s2">&quot;RMFVERSN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1992a&quot;</span>
+    <span class="n">m_head</span><span class="p">[</span><span class="s2">&quot;DATE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">date</span><span class="p">,</span> <span class="s2">&quot;Fake production date&quot;</span>
+    <span class="n">matrixhdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">BinTableHDU</span><span class="o">.</span><span class="n">from_columns</span><span class="p">(</span><span class="n">matrix_cols</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">m_head</span><span class="p">)</span>
+
+    <span class="n">col_emin</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;E_MIN&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="n">energ_lo</span><span class="p">,</span>
+                           <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;keV&quot;</span><span class="p">)</span>
+    <span class="n">col_emax</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;E_MAX&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="n">energ_hi</span><span class="p">,</span>
+                           <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;keV&quot;</span><span class="p">)</span>
+    <span class="n">col_channel</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;CHANNEL&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;1J&quot;</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="n">channels</span><span class="p">)</span>
+    <span class="n">bound_cols</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">ColDefs</span><span class="p">([</span><span class="n">col_emin</span><span class="p">,</span>
+                               <span class="n">col_emax</span><span class="p">,</span>
+                               <span class="n">col_channel</span><span class="p">])</span>
+    <span class="n">head2</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="p">()</span>
+    <span class="n">head2</span><span class="p">[</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;EBOUNDS&quot;</span><span class="p">,</span> <span class="s2">&quot;name of this binary table extension&quot;</span>
+    <span class="n">head2</span><span class="p">[</span><span class="s2">&quot;FILTER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">afilter</span>
+    <span class="n">head2</span><span class="p">[</span><span class="s2">&quot;CHANTYPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;PHA&quot;</span>
+    <span class="n">head2</span><span class="p">[</span><span class="s2">&quot;EFFAREA&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">effarea</span>
+    <span class="n">head2</span><span class="p">[</span><span class="s2">&quot;RMFVERSN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1992a&quot;</span>
+    <span class="n">head2</span><span class="p">[</span><span class="s2">&quot;DATE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">date</span><span class="p">,</span> <span class="s2">&quot;Fake production date&quot;</span>
+    <span class="n">boundshdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">BinTableHDU</span><span class="o">.</span><span class="n">from_columns</span><span class="p">(</span><span class="n">bound_cols</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">head2</span><span class="p">)</span>
+
+    <span class="n">rmffile</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">([</span><span class="n">prihdu</span><span class="p">,</span> <span class="n">matrixhdu</span><span class="p">,</span> <span class="n">boundshdu</span><span class="p">])</span>
+    <span class="n">rmffile</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.rmf&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">prefix</span><span class="p">),</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Evandro M. Ribeiro.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
