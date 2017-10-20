@@ -22,4 +22,4 @@ Python_
 .. _`Jupyter notebooks`: http://jupyter.org/index.html
 .. _Python: https://www.python.org/
 
-Link to the documentation: https://pyxspec_utils.readthedocs.io
+Link to the documentation: https://evandromr.github.io/pyxspec_utils/
