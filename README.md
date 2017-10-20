@@ -38,7 +38,7 @@ Import as a python module:
     import pyxspec_utils
 ```
 To show all available functions run:
-
+git remote add origin git@github.com:evandromr/pyxspec_utils.git
 ```python
     help(pyxspec_utils)
 ```
