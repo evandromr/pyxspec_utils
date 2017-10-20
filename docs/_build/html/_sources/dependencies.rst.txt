@@ -1,6 +1,0 @@
-Dependencies
-************
-
- - PyXspec
- - Astropy
- - Numpy
